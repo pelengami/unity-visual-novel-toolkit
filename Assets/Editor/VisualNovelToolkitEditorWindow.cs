@@ -1,62 +1,84 @@
-﻿using Assets.Scripts;
+﻿using System.Collections.Generic;
+using Assets.Editor.Localization;
+using Assets.Editor.ToolkitGui.Node;
+using Assets.Editor.ToolkitGui.Primitives;
+using Assets.Editor.ToolkitGui.Style;
+using Assets.Editor.ToolkitGui.Utils;
 using UnityEditor;
 using UnityEngine;
 
 namespace Assets.Editor
 {
-	internal sealed class VisualNovelToolkitEditorWindow : EditorWindow
+	sealed class VisualNovelToolkitEditorWindow : EditorWindow
 	{
 		private static EditorWindow _window;
+		private static PainterUtils _painterUtils;
+		private readonly GuiStylesDictionary _guiStylesDictionary = new GuiStylesDictionary();
 
-		private Vector2 _offset;
-		private Vector2 _drag;
+		private readonly List<Node> _nodes = new List<Node>();
 
 		[MenuItem("VisualNovelToolkit/Open")]
 		public static void ShowWindow()
 		{
 			_window = GetWindow<VisualNovelToolkitEditorWindow>(true, LocalizationStrings.WindowTitle, true);
+			_painterUtils = new PainterUtils(_window);
+		}
+
+		private void OnEnable()
+		{
+			_guiStylesDictionary.LoadStyles();
 		}
 
 		// ReSharper disable once InconsistentNaming
 		private void OnGUI()
 		{
-			DrawGrid(gridSpacing: 20, gridOpacity: 0.2f, gridColor: Color.black);
-			DrawGrid(gridSpacing: 100, gridOpacity: 0.4f, gridColor: Color.black);
+			_painterUtils.DrawGrid();
 
 			DrawNodes();
 
+			ProcessNodeEvents(Event.current);
 			ProcessEvents(Event.current);
 
-			if (GUI.changed) Repaint();
-		}
+			if (GUI.changed)
+				Repaint();
+		}  
 
 		private void DrawNodes()
 		{
+			foreach (var node in _nodes)
+				node.Draw();
 		}
 
 		private void ProcessEvents(Event e)
 		{
+			switch (e.type)
+			{
+				case EventType.MouseDown:
+					if (e.button == 1)
+						ProcessContextMenu(e.mousePosition);
+					break;
+			}
 		}
 
-		private void DrawGrid(float gridSpacing, float gridOpacity, Color gridColor)
+		private void ProcessNodeEvents(Event e)
 		{
-			int widthDivs = Mathf.CeilToInt(position.width / gridSpacing);
-			int heightDivs = Mathf.CeilToInt(position.height / gridSpacing);
+			foreach (var node in _nodes)
+			{
+				bool guiChanged = node.ProcessEvents(e);
+				if (guiChanged)
+					GUI.changed = true;
+			}
+		}
 
-			Handles.BeginGUI();
-			Handles.color = new Color(gridColor.r, gridColor.g, gridColor.b, gridOpacity);
+		private void ProcessContextMenu(Vector2 mousePosition)
+		{
+			var contextMenu = new NodeContextMenu(mousePosition);
 
-			_offset += _drag * 0.5f;
-			var newOffset = new Vector3(_offset.x % gridSpacing, _offset.y % gridSpacing, 0);
-
-			for (int i = 0; i < widthDivs; i++)
-				Handles.DrawLine(new Vector3(gridSpacing * i, -gridSpacing, 0) + newOffset, new Vector3(gridSpacing * i, position.height, 0f) + newOffset);
-
-			for (int j = 0; j < heightDivs; j++)
-				Handles.DrawLine(new Vector3(-gridSpacing, gridSpacing * j, 0) + newOffset, new Vector3(position.width, gridSpacing * j, 0f) + newOffset);
-
-			Handles.color = Color.black;
-			Handles.EndGUI();
+			contextMenu.Clicked += delegate
+			{
+				var style = _guiStylesDictionary.GetStyle(NodeStyleNames.LoadScene);
+				_nodes.Add(new Node(mousePosition, 50, 50, style));
+			};
 		}
 	}
 }
