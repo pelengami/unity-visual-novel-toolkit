@@ -3,7 +3,7 @@ using Assets.Editor.Localization;
 using UnityEditor;
 using UnityEngine;
 
-namespace Assets.Editor.ToolkitGui.Primitives
+namespace Assets.Editor.ToolkitGui.Controls
 {
 	sealed class NodeContextMenu
 	{
