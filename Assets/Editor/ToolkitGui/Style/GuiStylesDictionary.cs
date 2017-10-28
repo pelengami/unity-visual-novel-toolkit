@@ -11,8 +11,17 @@ namespace Assets.Editor.ToolkitGui.Style
 
 		public void LoadStyles()
 		{
-			var style = CreateStyle("Assets/Editor/Textures/circle.png");
-			_styles[NodeStyleNames.LoadScene] = style;
+			var style = CreateNodeStyle("Assets/Editor/Textures/unity_icon_1.png");
+			_styles[StyleNames.LoadSceneNode] = style;
+
+			style = CreateNodeStyle("Assets/Editor/Textures/circle.png");
+			_styles[StyleNames.ChangeBackgroundNode] = style;
+
+			style = CreateConnectionPointStyle("Assets/Editor/Textures/circle.png", "Assets/Editor/Textures/circle.png");
+			_styles[StyleNames.ConnectionIn] = style;
+
+			style = CreateConnectionPointStyle("Assets/Editor/Textures/circle.png", "Assets/Editor/Textures/circle.png");
+			_styles[StyleNames.ConnectionOut] = style;
 		}
 
 		public GUIStyle GetStyle(string styleName)
@@ -23,14 +32,26 @@ namespace Assets.Editor.ToolkitGui.Style
 			return style;
 		}
 
-		private static GUIStyle CreateStyle(string textureName)
+		private static GUIStyle CreateNodeStyle(string textureName)
 		{
 			var texture = TextureUtils.LoadTexture(textureName);
 
 			var style = new GUIStyle
 			{
 				normal = { background = texture },
-				border = new RectOffset(2, 2, 2, 2)
+				border = new RectOffset(2, 2, 2, 2),
+			};
+
+			return style;
+		}
+
+		private static GUIStyle CreateConnectionPointStyle(string textureNameNormal, string textureNameActive)
+		{
+			var style = new GUIStyle
+			{
+				normal = { background = TextureUtils.LoadTexture(textureNameNormal) },
+				active = { background = TextureUtils.LoadTexture(textureNameActive) },
+				border = new RectOffset(4, 4, 12, 12)
 			};
 
 			return style;
