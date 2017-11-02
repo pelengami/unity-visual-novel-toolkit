@@ -1,0 +1,32 @@
+﻿using UnityEngine;
+
+namespace Assets.Editor.System.ConnectionLine
+{
+	sealed class ConnectionPresenter
+	{
+		private readonly ConnectionView _connectionView;
+		private readonly ConnectionModel _connectionModel;
+		private Vector2 _mousePosition;
+
+		public ConnectionPresenter(ConnectionView connectionView, ConnectionModel connectionModel)
+		{
+			_connectionView = connectionView;
+			_connectionModel = connectionModel;
+		}
+
+		public void Draw()
+		{
+
+		}
+
+		public void Draw(Rect rect)
+		{
+			_connectionView.Draw(rect, _mousePosition);
+		}
+
+		public void ProcessEvents(Event e)
+		{
+			_mousePosition = e.mousePosition;
+		}
+	}
+}

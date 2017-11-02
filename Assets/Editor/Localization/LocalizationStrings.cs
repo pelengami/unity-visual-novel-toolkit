@@ -2,8 +2,7 @@
 {
 	static class LocalizationStrings
 	{
-		public static string WindowTitle = "VisualNovelToolkit";
-		public static string LoadSceneNodeTitle = "Load Scene";
-		public static string ChangeBackgroundNoteTitle = "Change Background";
+		public static readonly string WindowTitle = "VisualNovelToolkit";
+		public static readonly string SetBackgroundNode = "Set Background";
 	}
 }
