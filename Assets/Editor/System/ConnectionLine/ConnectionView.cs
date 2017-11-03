@@ -1,15 +1,22 @@
-﻿using System;
-using Assets.Editor.System.ConnectionPoint;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace Assets.Editor.System.ConnectionLine
 {
 	sealed class ConnectionView
 	{
-		public ConnectionPointView InPointView;
-		public ConnectionPointView OutPointView;
-		public Action<ConnectionView> OnClickRemoveConnection;
+		public void Draw(Rect fromRect, Rect toRect)
+		{
+			Handles.DrawBezier(
+				fromRect.center,
+				toRect.center,
+				fromRect.center + Vector2.left * 50f,
+				toRect.center - Vector2.left * 50f,
+				Color.white,
+				null,
+				2f
+			);
+		}
 
 		public void Draw(Rect rect, Vector2 mousePosition)
 		{

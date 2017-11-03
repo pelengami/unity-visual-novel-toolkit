@@ -1,4 +1,4 @@
-﻿using Assets.Editor.System.ConnectionLine;
+﻿using System;
 using UnityEngine;
 
 namespace Assets.Editor.System.ConnectionPoint
@@ -7,36 +7,35 @@ namespace Assets.Editor.System.ConnectionPoint
 	{
 		private bool _isSelected;
 		private readonly ConnectionPointView _connectionPointView;
-		private readonly ConnectionPresenter _connectionPresenter;
 
 		public ConnectionPointPresenter(ConnectionPointView connectionPointView)
 		{
 			_connectionPointView = connectionPointView;
-
-			_connectionPresenter = new ConnectionPresenter(new ConnectionView(), new ConnectionModel());
-
 			_connectionPointView.Clicked += OnClicked;
 		}
 
+		public event Action Selected;
+		public event Action UnSelected;
+
 		public bool IsSelected { get { return _isSelected; } }
+		public Rect Rect { get { return _connectionPointView.Rect; } }
 
 		public void Draw()
 		{
 			_connectionPointView.Draw();
-
-			//draw connection to mouse position
-			if (_isSelected)
-				_connectionPresenter.Draw(_connectionPointView.Rect);
 		}
 
 		public void ProcessEvents(Event e)
 		{
-			_connectionPresenter.ProcessEvents(e);
-
 			switch (e.type)
 			{
 				case EventType.mouseUp:
-					_isSelected = false;
+					if (_isSelected)
+					{
+						_isSelected = false;
+						if (UnSelected != null)
+							UnSelected.Invoke();
+					}
 					break;
 			}
 		}
@@ -44,6 +43,8 @@ namespace Assets.Editor.System.ConnectionPoint
 		private void OnClicked()
 		{
 			_isSelected = true;
+			if (Selected != null)
+				Selected.Invoke();
 		}
 	}
 }

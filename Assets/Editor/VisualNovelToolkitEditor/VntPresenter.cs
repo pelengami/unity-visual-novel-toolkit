@@ -15,7 +15,13 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 		private readonly StylesCollection _stylesCollection = new StylesCollection();
 		private readonly List<NodePresenter> _nodePresenters = new List<NodePresenter>();
 		private readonly List<ConnectionPresenter> _connectionPresenters = new List<ConnectionPresenter>();
+		private readonly ConnectionPresenter _connectionToMousePresenter;
 		private readonly VntModel _vntModel;
+
+		private NodePresenter _selectedNode;
+
+		private NodePresenter _selectedNodePresenter;
+		private ConnectionPointPresenter _selectedPointPresenter;
 
 		public VntPresenter(IVntView vntView, VntModel vntModel)
 		{
@@ -26,6 +32,8 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 			_vntView.OnGui += VntViewOnGui;
 			_vntView.Drag += VntViewOnDrag;
 			_vntView.ProcessedEvents += VntViewOnProcessedEvents;
+
+			_connectionToMousePresenter = new ConnectionPresenter(new ConnectionView(), new ConnectionModel());
 		}
 
 		private void VntViewOnAwaked()
@@ -41,6 +49,9 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 
 			foreach (var connectionPresenter in _connectionPresenters)
 				connectionPresenter.Draw();
+
+			if (_selectedNodePresenter != null && _selectedNodePresenter.SelectedConnectionPointPresenter != null)
+				_connectionToMousePresenter.Draw(_selectedNodePresenter.SelectedConnectionPointPresenter.Rect);
 		}
 
 		private void VntViewOnProcessedEvents(Event e)
@@ -50,6 +61,8 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 
 			foreach (var connectionPresenter in _connectionPresenters)
 				connectionPresenter.ProcessEvents(e);
+
+			_connectionToMousePresenter.ProcessEvents(e);
 		}
 
 		private void VntViewOnDrag(Vector2 vector2)
@@ -92,8 +105,41 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 			var connectionPointOutPresenter = new ConnectionPointPresenter(new ConnectionPointView(nodeView, connectionPointOutStyle, ConnectionPointType.Out));
 
 			var nodePresenter = new NodePresenter(nodeView, connectionPointInPresenter, connectionPointOutPresenter);
+			nodePresenter.ConnectionPointSelected += NodePresenterOnConnectionPointSelected;
+			nodePresenter.ConnectionPointUnSelected += NodePresenterOnConnectionPointUnSelected;
 
 			_nodePresenters.Add(nodePresenter);
+		}
+
+		private void NodePresenterOnConnectionPointSelected(NodePresenter nodePresenter, ConnectionPointPresenter connectionPointPresenter)
+		{
+			if (_selectedNodePresenter != null && _selectedNodePresenter.Id != nodePresenter.Id)
+			{
+				var selectedConnectionPointPresenter = _selectedPointPresenter;
+
+				var connectionBetweenNodes = new ConnectionPresenter(new ConnectionView(), new ConnectionModel())
+				{
+					ConnectionPointFrom = selectedConnectionPointPresenter,
+					ConnectionPointTo = connectionPointPresenter
+				};
+
+				_selectedNodePresenter.AddNextNode(nodePresenter);
+
+				_connectionPresenters.Add(connectionBetweenNodes);
+
+				_selectedNodePresenter = null;
+
+				return;
+			}
+
+			_selectedNodePresenter = nodePresenter;
+			_selectedPointPresenter = connectionPointPresenter;
+		}
+
+		private void NodePresenterOnConnectionPointUnSelected(NodePresenter nodePresenter, ConnectionPointPresenter connectionPointPresenter)
+		{
+			_selectedNodePresenter = null;
+			_selectedPointPresenter = null;
 		}
 	}
 }

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using Assets.Editor.System.ConnectionPoint;
+using Assets.Editor.System.Node;
+using UnityEngine;
 
 namespace Assets.Editor.System.ConnectionLine
 {
@@ -14,9 +16,13 @@ namespace Assets.Editor.System.ConnectionLine
 			_connectionModel = connectionModel;
 		}
 
+		public ConnectionPointPresenter ConnectionPointFrom { get; set; }
+		public ConnectionPointPresenter ConnectionPointTo { get; set; }
+
 		public void Draw()
 		{
-
+			if (ConnectionPointFrom != null && ConnectionPointTo != null)
+				_connectionView.Draw(ConnectionPointFrom.Rect, ConnectionPointTo.Rect);
 		}
 
 		public void Draw(Rect rect)
