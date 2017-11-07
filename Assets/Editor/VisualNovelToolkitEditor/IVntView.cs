@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Assets.Editor.ToolkitGui.Controls.ContextMenu;
+using Assets.Editor.ToolkitGui.Controls.ToolPanelButton;
 using UnityEngine;
 
 namespace Assets.Editor.VisualNovelToolkitEditor
@@ -14,5 +15,6 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 		event Action<Event> ProcessedEvents;
 
 		void ShowContextMenu(Vector2 mousePosition, List<ContextMenuItem> contextMenuItems);
+		void DrawToolPanel(List<ToolPanelButton> buttons);
 	}
 }

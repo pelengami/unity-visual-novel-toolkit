@@ -1,22 +1,35 @@
 ﻿using System;
 using Assets.Editor.System.Node;
+using Assets.Editor.ToolkitGui.Styles;
 using UnityEngine;
 
 namespace Assets.Editor.System.ConnectionPoint
 {
 	sealed class ConnectionPointView
 	{
+		private const float Width = 25f;
+		private const float Height = 25f;
+
 		private readonly INodeView _nodeView;
 		private readonly GUIStyle _style;
 		private readonly ConnectionPointType _type;
 		private Rect _rect;
 
-		public ConnectionPointView(INodeView nodeView, GUIStyle guiStyle, ConnectionPointType type)
+		public ConnectionPointView(INodeView nodeView, ConnectionPointType type)
 		{
-			_rect = new Rect(0, 0, 25f, 25f);
+			_rect = new Rect(0, 0, Width, Height);
 			_nodeView = nodeView;
-			_style = guiStyle;
 			_type = type;
+
+			switch (type)
+			{
+				case ConnectionPointType.In:
+					_style = StylesCollection.GetStyle(VntStyles.ConnectionIn);
+					break;
+				case ConnectionPointType.Out:
+					_style = StylesCollection.GetStyle(VntStyles.ConnectionOut);
+					break;
+			}
 		}
 
 		public Action Clicked;

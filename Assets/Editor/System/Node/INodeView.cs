@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Assets.Editor.ToolkitGui.Controls.ContextMenu;
+using Assets.Editor.ToolkitGui.Controls.ParametersPanel;
 using UnityEngine;
 
 namespace Assets.Editor.System.Node
@@ -12,6 +13,7 @@ namespace Assets.Editor.System.Node
 		Rect Rect { get; }
 
 		void Draw();
+		void DrawParameters(NodeParametersPanel nodeParametersPanel);
 		void Drag(Vector2 delta);
 		bool ProcessEvents(Event e);
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Assets.Editor.Localization;
 using Assets.Editor.ToolkitGui.Controls.ContextMenu;
+using Assets.Editor.ToolkitGui.Controls.ToolPanelButton;
 using Assets.Editor.ToolkitGui.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -24,10 +25,10 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 		public float Width { get { return _window.position.width; } }
 		public float Height { get { return _window.position.height; } }
 
-		[MenuItem("VisualNovelToolkit/Open")]
+		[MenuItem("VisualNovelToolkit/ShowDialog")]
 		public static void ShowEdiorMenuItem()
 		{
-			_window = GetWindow<VntView>(true, LocalizationStrings.WindowTitle, true);
+			_window = GetWindow<VntView>(false, LocalizationStrings.WindowTitle, true);
 		}
 
 		public void Awake()
@@ -43,6 +44,14 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 		{
 			var genericMenu = ContextMenuBuilder.Build(contextMenuItems, mousePosition);
 			genericMenu.ShowAsContext();
+		}
+
+		public void DrawToolPanel(List<ToolPanelButton> toolPanelButtons)
+		{
+			GUILayout.BeginHorizontal(EditorStyles.toolbar);
+			foreach (var toolPanelButton in toolPanelButtons)
+				toolPanelButton.Draw();
+			GUILayout.EndHorizontal();
 		}
 
 		// ReSharper disable once InconsistentNaming

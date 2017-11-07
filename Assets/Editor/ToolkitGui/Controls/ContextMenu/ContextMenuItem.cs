@@ -11,6 +11,7 @@ namespace Assets.Editor.ToolkitGui.Controls.ContextMenu
 
 		public void RaiseClicked(Vector2 mousePosition)
 		{
+			// ReSharper disable once UseNullPropagation
 			if (Clicked != null)
 				Clicked.Invoke(mousePosition);
 		}

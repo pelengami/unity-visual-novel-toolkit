@@ -2,9 +2,9 @@
 
 namespace Assets.Editor.System.Node
 {
-	sealed class NodeData
+	abstract class NodeData
 	{
-		public NodeData()
+		protected NodeData()
 		{
 			Id = Guid.NewGuid();
 		}

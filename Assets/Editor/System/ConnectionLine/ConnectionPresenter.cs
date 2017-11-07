@@ -1,5 +1,4 @@
 ﻿using Assets.Editor.System.ConnectionPoint;
-using Assets.Editor.System.Node;
 using UnityEngine;
 
 namespace Assets.Editor.System.ConnectionLine

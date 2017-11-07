@@ -2,11 +2,6 @@
 {
 	sealed class VntModel
 	{
-		public VntModel()
-		{
-
-		}
-
 		public void LoadNodes()
 		{
 			

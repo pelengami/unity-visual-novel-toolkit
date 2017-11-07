@@ -33,6 +33,7 @@ namespace Assets.Editor.System.ConnectionPoint
 					if (_isSelected)
 					{
 						_isSelected = false;
+
 						if (UnSelected != null)
 							UnSelected.Invoke();
 					}

@@ -1,9 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Assets.Editor.Localization;
 using Assets.Editor.System.ConnectionLine;
 using Assets.Editor.System.ConnectionPoint;
 using Assets.Editor.System.Node;
+using Assets.Editor.System.Node.CharacterNode;
+using Assets.Editor.System.Node.CharacterNode.AnswerNode;
+using Assets.Editor.System.Node.CharacterNode.DialogueNode;
+using Assets.Editor.System.Node.CharacterNode.QuestionNode;
+using Assets.Editor.System.Node.SetBackgroundNode;
 using Assets.Editor.ToolkitGui.Controls.ContextMenu;
+using Assets.Editor.ToolkitGui.Controls.ToolPanelButton;
 using Assets.Editor.ToolkitGui.Styles;
 using UnityEngine;
 
@@ -12,7 +19,6 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 	sealed class VntPresenter
 	{
 		private readonly IVntView _vntView;
-		private readonly StylesCollection _stylesCollection = new StylesCollection();
 		private readonly List<NodePresenter> _nodePresenters = new List<NodePresenter>();
 		private readonly List<ConnectionPresenter> _connectionPresenters = new List<ConnectionPresenter>();
 		private readonly ConnectionPresenter _connectionToMousePresenter;
@@ -38,12 +44,14 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 
 		private void VntViewOnAwaked()
 		{
-			_stylesCollection.LoadStyles();
+			StylesCollection.LoadStyles();
 			_vntModel.LoadNodes();
 		}
 
 		private void VntViewOnGui()
 		{
+			DrawToolPanel();
+
 			foreach (var nodePresenter in _nodePresenters)
 				nodePresenter.Draw();
 
@@ -52,6 +60,26 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 
 			if (_selectedNodePresenter != null && _selectedNodePresenter.SelectedConnectionPointPresenter != null)
 				_connectionToMousePresenter.Draw(_selectedNodePresenter.SelectedConnectionPointPresenter.Rect);
+		}
+
+		private void DrawToolPanel()
+		{
+			var createNewButton = new ToolPanelButton("Create");
+			var loadButton = new ToolPanelButton("Load");
+			var saveButton = new ToolPanelButton("Save");
+
+			createNewButton.Clicked += () => { };
+			loadButton.Clicked += () => { };
+			saveButton.Clicked += () => { };
+
+			var toolPanelButtons = new List<ToolPanelButton>()
+			{
+				createNewButton,
+				loadButton,
+				saveButton
+			};
+
+			_vntView.DrawToolPanel(toolPanelButtons);
 		}
 
 		private void VntViewOnProcessedEvents(Event e)
@@ -73,16 +101,43 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 
 		private void VntViewOnMouseClicked(Vector2 mousePosition)
 		{
-			var setBackgroundContextMenuItem = new ContextMenuItem
+			var backgroundMenuItem = new ContextMenuItem
 			{
 				Title = LocalizationStrings.SetBackgroundNode,
 			};
+			backgroundMenuItem.Clicked += OnSetBackgroundClicked;
 
-			setBackgroundContextMenuItem.Clicked += OnSetBackgroundClicked;
+			var characterMenuItem = new ContextMenuItem
+			{
+				Title = LocalizationStrings.CharacterNode
+			};
+			characterMenuItem.Clicked += OnCharacterMenuItemClicked;
+
+			var dualogueMenuItem = new ContextMenuItem
+			{
+				Title = LocalizationStrings.DialogueNode
+			};
+			dualogueMenuItem.Clicked += OnDialogueMenuItemClicked;
+
+			var questionMenuItem = new ContextMenuItem
+			{
+				Title = LocalizationStrings.QuestionNode
+			};
+			questionMenuItem.Clicked += OnQuestionMenuItemClicked;
+
+			var answerMenuItem = new ContextMenuItem
+			{
+				Title = LocalizationStrings.AnswerNode
+			};
+			answerMenuItem.Clicked += OnAnswerMenuItemClicked;
 
 			var contextMenuItems = new List<ContextMenuItem>
 			{
-				setBackgroundContextMenuItem
+				backgroundMenuItem,
+				characterMenuItem,
+				dualogueMenuItem,
+				questionMenuItem,
+				answerMenuItem
 			};
 
 			_vntView.ShowContextMenu(mousePosition, contextMenuItems);
@@ -90,28 +145,45 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 
 		private void OnSetBackgroundClicked(Vector2 mousePosition)
 		{
-			CreateNode(mousePosition);
-		}
-
-		private void CreateNode(Vector2 mousePosition)
-		{
-			var defaultNodeStyle = _stylesCollection.GetStyle(StyleNames.SetBackgroundNode);
-			var connectionPointInStyle = _stylesCollection.GetStyle(StyleNames.ConnectionIn);
-			var connectionPointOutStyle = _stylesCollection.GetStyle(StyleNames.ConnectionOut);
-
-			var nodeView = new NodeView(defaultNodeStyle, defaultNodeStyle, LocalizationStrings.SetBackgroundNode, mousePosition);
-
-			var connectionPointInPresenter = new ConnectionPointPresenter(new ConnectionPointView(nodeView, connectionPointInStyle, ConnectionPointType.In));
-			var connectionPointOutPresenter = new ConnectionPointPresenter(new ConnectionPointView(nodeView, connectionPointOutStyle, ConnectionPointType.Out));
-
-			var nodePresenter = new NodePresenter(nodeView, connectionPointInPresenter, connectionPointOutPresenter);
-			nodePresenter.ConnectionPointSelected += NodePresenterOnConnectionPointSelected;
-			nodePresenter.ConnectionPointUnSelected += NodePresenterOnConnectionPointUnSelected;
-
+			var nodePresenter = SetBackgroundNodePresenter.Create(mousePosition);
+			nodePresenter.ConnectionPointSelected += OnConnectionPointSelected;
+			nodePresenter.ConnectionPointUnSelected += OnConnectionPointUnSelected;
 			_nodePresenters.Add(nodePresenter);
 		}
 
-		private void NodePresenterOnConnectionPointSelected(NodePresenter nodePresenter, ConnectionPointPresenter connectionPointPresenter)
+		private void OnCharacterMenuItemClicked(Vector2 mousePosition)
+		{
+			var nodePresenter = CharacterNodePresenter.Create(mousePosition);
+			nodePresenter.ConnectionPointSelected += OnConnectionPointSelected;
+			nodePresenter.ConnectionPointUnSelected += OnConnectionPointUnSelected;
+			_nodePresenters.Add(nodePresenter);
+		}
+
+		private void OnDialogueMenuItemClicked(Vector2 mousePosition)
+		{
+			var nodePresenter = DialogueNodePresenter.Create(mousePosition);
+			nodePresenter.ConnectionPointSelected += OnConnectionPointSelected;
+			nodePresenter.ConnectionPointUnSelected += OnConnectionPointUnSelected;
+			_nodePresenters.Add(nodePresenter);
+		}
+
+		private void OnQuestionMenuItemClicked(Vector2 mousePosition)
+		{
+			var nodePresenter = QuestionNodePresenter.Create(mousePosition);
+			nodePresenter.ConnectionPointSelected += OnConnectionPointSelected;
+			nodePresenter.ConnectionPointUnSelected += OnConnectionPointUnSelected;
+			_nodePresenters.Add(nodePresenter);
+		}
+
+		private void OnAnswerMenuItemClicked(Vector2 mousePosition)
+		{
+			var nodePresenter = AnswerNodePresenter.Create(mousePosition);
+			nodePresenter.ConnectionPointSelected += OnConnectionPointSelected;
+			nodePresenter.ConnectionPointUnSelected += OnConnectionPointUnSelected;
+			_nodePresenters.Add(nodePresenter);
+		}
+
+		private void OnConnectionPointSelected(NodePresenter nodePresenter, ConnectionPointPresenter connectionPointPresenter)
 		{
 			if (_selectedNodePresenter != null && _selectedNodePresenter.Id != nodePresenter.Id)
 			{
@@ -136,7 +208,7 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 			_selectedPointPresenter = connectionPointPresenter;
 		}
 
-		private void NodePresenterOnConnectionPointUnSelected(NodePresenter nodePresenter, ConnectionPointPresenter connectionPointPresenter)
+		private void OnConnectionPointUnSelected(NodePresenter nodePresenter, ConnectionPointPresenter connectionPointPresenter)
 		{
 			_selectedNodePresenter = null;
 			_selectedPointPresenter = null;

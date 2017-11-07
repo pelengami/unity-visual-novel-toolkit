@@ -5,27 +5,51 @@ using UnityEngine;
 
 namespace Assets.Editor.ToolkitGui.Styles
 {
-	sealed class StylesCollection
+	static class StylesCollection
 	{
-		private readonly Dictionary<string, GUIStyle> _styles = new Dictionary<string, GUIStyle>();
+		private static readonly Dictionary<VntStyles, GUIStyle> Styles = new Dictionary<VntStyles, GUIStyle>();
 
-		public void LoadStyles()
+		public static void LoadStyles()
 		{
-			var style = CreateNodeStyle("Assets/Editor/Textures/SetBackgroundNode.psd");
-			_styles[StyleNames.SetBackgroundNode] = style;
+			var style = CreateNodeStyle("Assets/Editor/Textures/NodeBackground.psd");
+			Styles[VntStyles.SetBackgroundNode] = style;
+
+			style = CreateNodeStyle("Assets/Editor/Textures/NodeCharacter.psd");
+			Styles[VntStyles.CharacterNode] = style;
+
+			style = CreateNodeStyle("Assets/Editor/Textures/NodeCharacterDialogue.psd");
+			Styles[VntStyles.DialogueNode] = style;
+
+			style = CreateNodeStyle("Assets/Editor/Textures/NodeCharacterAnswer.psd");
+			Styles[VntStyles.AnswerNode] = style;
+
+			style = CreateNodeStyle("Assets/Editor/Textures/NodeCharacterQuestion.psd");
+			Styles[VntStyles.QuestionNode] = style;
 
 			style = CreateConnectionPointStyle("Assets/Editor/Textures/ConnectionPointNormal.psd", "Assets/Editor/Textures/ConnectionPointActive.psd");
-			_styles[StyleNames.ConnectionIn] = style;
+			Styles[VntStyles.ConnectionIn] = style;
 
 			style = CreateConnectionPointStyle("Assets/Editor/Textures/ConnectionPointNormal.psd", "Assets/Editor/Textures/ConnectionPointActive.psd");
-			_styles[StyleNames.ConnectionOut] = style;
+			Styles[VntStyles.ConnectionOut] = style;
+
+			style = CreateNodeStyle("Assets/Editor/Textures/NodeParameters.psd");
+			Styles[VntStyles.NodeParameters] = style;
+
+			style = CreateLabelStyle();
+			Styles[VntStyles.Label] = style;
+
+			style = CreateButtonStyle("Assets/Editor/Textures/ConnectionPointNormal.psd");
+			Styles[VntStyles.Button] = style;
+
+			style = CreateButtonStyle("Assets/Editor/Textures/Down.psd");
+			Styles[VntStyles.ButtonArrow] = style;
 		}
 
-		public GUIStyle GetStyle(string styleName)
+		public static GUIStyle GetStyle(VntStyles vntStyle)
 		{
 			GUIStyle style;
-			if (!_styles.TryGetValue(styleName, out style))
-				throw new InvalidOperationException(styleName + " not found");
+			if (!Styles.TryGetValue(vntStyle, out style))
+				throw new InvalidOperationException(vntStyle + " not found");
 			return style;
 		}
 
@@ -51,6 +75,30 @@ namespace Assets.Editor.ToolkitGui.Styles
 				border = new RectOffset(1, 1, 1, 1)
 			};
 
+			return style;
+		}
+
+		private static GUIStyle CreateLabelStyle()
+		{
+			var style = new GUIStyle
+			{
+				normal = { textColor = Color.white },
+				fontSize = 12
+			};
+
+			return style;
+		}
+
+		private static GUIStyle CreateButtonStyle(string textureNormal)
+		{
+			var style = new GUIStyle
+			{
+				normal =
+				{
+					textColor = Color.white,
+					background = TextureUtils.LoadTexture(textureNormal)
+				},
+			};
 			return style;
 		}
 	}

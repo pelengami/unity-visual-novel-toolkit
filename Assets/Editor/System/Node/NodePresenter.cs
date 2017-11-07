@@ -1,23 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using Assets.Editor.System.ConnectionLine;
 using Assets.Editor.System.ConnectionPoint;
+using Assets.Editor.ToolkitGui.Controls.ParametersPanel;
 using UnityEngine;
 
 namespace Assets.Editor.System.Node
 {
-	sealed class NodePresenter
+	abstract class NodePresenter
 	{
 		private readonly INodeView _nodeView;
+		private readonly NodeData _nodeData;
 		private readonly ConnectionPointPresenter _connectionPointInPresenter;
 		private readonly ConnectionPointPresenter _connectionPointOutPresenter;
 		private readonly List<NodePresenter> _nextNodes = new List<NodePresenter>();
 
 		private ConnectionPointPresenter _selectedConnectionPointPresenter;
 
-		public NodePresenter(INodeView nodeView, ConnectionPointPresenter connectionPointInPresenter, ConnectionPointPresenter connectionPointOutPresenter)
+		protected NodePresenter(INodeView nodeView, NodeData nodeData, ConnectionPointPresenter connectionPointInPresenter, ConnectionPointPresenter connectionPointOutPresenter)
 		{
 			_nodeView = nodeView;
+			_nodeData = nodeData;
 			_connectionPointInPresenter = connectionPointInPresenter;
 			_connectionPointOutPresenter = connectionPointOutPresenter;
 
@@ -39,17 +41,22 @@ namespace Assets.Editor.System.Node
 		public ConnectionPointPresenter SelectedConnectionPointPresenter { get { return _selectedConnectionPointPresenter; } }
 		public Guid Id { get; }
 
-		public void AddNextNode(NodePresenter nodePresenter)
-		{
-			_nextNodes.Add(nodePresenter);
-		}
-
-		public void Draw()
+		public virtual void Draw()
 		{
 			_nodeView.Draw();
 
 			_connectionPointInPresenter.Draw();
 			_connectionPointOutPresenter.Draw();
+		}
+
+		public void DrawParameters(NodeParametersPanel nodeParametersPanel)
+		{
+			_nodeView.DrawParameters(nodeParametersPanel);
+		}
+
+		public void AddNextNode(NodePresenter nodePresenter)
+		{
+			_nextNodes.Add(nodePresenter);
 		}
 
 		public void Drag(Vector2 mousePosition)

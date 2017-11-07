@@ -1,49 +1,77 @@
 ﻿using System;
 using System.Collections.Generic;
 using Assets.Editor.ToolkitGui.Controls.ContextMenu;
+using Assets.Editor.ToolkitGui.Controls.ParametersPanel;
+using Assets.Editor.ToolkitGui.Styles;
 using UnityEngine;
 
 namespace Assets.Editor.System.Node
 {
-	sealed class NodeView : INodeView
+	abstract class NodeView : INodeView
 	{
-		private readonly string _title;
-		private readonly GUIStyle _defaultNodeStyle;
-		private readonly GUIStyle _selectedNodeStyle;
+		protected Rect BRect;
+		protected GUIStyle DefaultNodeStyle;
+		protected GUIStyle SelectedNodeStyle;
 
+		private const float PaddingNameTop = 18;
+		private const float Width = 70;
+		private const float Height = 70;
+		private const float ButtonArrowWidth = 35;
+		private const float ButtonArrowHeight = 35;
+
+		private readonly string _title;
+		private readonly GUIStyle _labelStyle;
+		private GUIStyle _buttonStyle;
+		private readonly GUIStyle _arrowButtonStyle;
 		private bool _isExpanded;
 		private bool _isSelected;
 		private bool _isDragged;
-		private Rect _rect;
 
-		public NodeView(GUIStyle defaultStyleName, GUIStyle selectedStyleName, string title, Vector2 position)
+		protected NodeView(string title, Vector2 position)
 		{
-			_defaultNodeStyle = defaultStyleName;
-			_selectedNodeStyle = selectedStyleName;
 			_title = title;
+			BRect = new Rect(position.x, position.y, Width, Height);
 
-			_rect = new Rect(position.x, position.y, 100, 100);
+			_labelStyle = StylesCollection.GetStyle(VntStyles.Label);
+			_buttonStyle = StylesCollection.GetStyle(VntStyles.Button);
+			_arrowButtonStyle = StylesCollection.GetStyle(VntStyles.ButtonArrow);
 		}
 
 		public event Action<Vector2> MouseClicked;
 
-		public Rect Rect { get { return _rect; } }
+		public Rect Rect { get { return BRect; } }
+		public bool IsExpanded { get { return _isExpanded; } }
+
+		public virtual void Draw()
+		{
+			var style = _isSelected ? SelectedNodeStyle : DefaultNodeStyle;
+			GUI.Box(BRect, "", style);
+
+			var labelRect = new Rect(BRect.x, BRect.y - PaddingNameTop, 100, 20);
+			GUI.Box(labelRect, _title, _labelStyle);
+
+			var buttonArrowRect = new Rect(BRect.x + Width / 2 + 15, BRect.y + 45, ButtonArrowWidth, ButtonArrowHeight);
+			if (GUI.Button(buttonArrowRect, "", _arrowButtonStyle))
+				_isExpanded = !_isExpanded;
+		}
+
+		public void DrawParameters(NodeParametersPanel nodeParametersPanel)
+		{
+			if (!_isExpanded)
+				return;
+
+			nodeParametersPanel.Draw(BRect);
+		}
 
 		public void Drag(Vector2 delta)
 		{
-			_rect.position += delta;
+			BRect.position += delta;
 		}
 
 		public void ShowContextMenu(Vector2 mousePosition, List<ContextMenuItem> contextMenuItems)
 		{
 			var genericMenu = ContextMenuBuilder.Build(contextMenuItems, mousePosition);
 			genericMenu.ShowAsContext();
-		}
-
-		public void Draw()
-		{
-			var style = _isSelected ? _selectedNodeStyle : _defaultNodeStyle;
-			GUI.Box(_rect, _title, style);
 		}
 
 		public bool ProcessEvents(Event e)
@@ -53,7 +81,7 @@ namespace Assets.Editor.System.Node
 				case EventType.MouseDown:
 					if (e.button == 0)
 					{
-						if (_rect.Contains(e.mousePosition))
+						if (BRect.Contains(e.mousePosition))
 						{
 							_isDragged = true;
 							_isSelected = true;
@@ -66,7 +94,7 @@ namespace Assets.Editor.System.Node
 						}
 					}
 
-					if (e.button == 1 && _isSelected && _rect.Contains(e.mousePosition))
+					if (e.button == 1 && _isSelected && BRect.Contains(e.mousePosition))
 					{
 						if (MouseClicked != null)
 							MouseClicked.Invoke(e.mousePosition);
