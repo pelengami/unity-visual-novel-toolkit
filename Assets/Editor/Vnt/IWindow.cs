@@ -1,4 +1,4 @@
-﻿namespace Assets.Editor.VisualNovelToolkitEditor
+﻿namespace Assets.Editor.Vnt
 {
 	interface IWindow
 	{

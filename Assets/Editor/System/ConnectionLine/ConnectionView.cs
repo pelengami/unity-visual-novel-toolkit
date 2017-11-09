@@ -10,8 +10,8 @@ namespace Assets.Editor.System.ConnectionLine
 			Handles.DrawBezier(
 				fromRect.center,
 				toRect.center,
-				fromRect.center + Vector2.left * 50f,
-				toRect.center - Vector2.left * 50f,
+				fromRect.center + Vector2.left,
+				toRect.center - Vector2.left,
 				Color.white,
 				null,
 				2f
@@ -23,8 +23,8 @@ namespace Assets.Editor.System.ConnectionLine
 			Handles.DrawBezier(
 				rect.center,
 				mousePosition,
-				rect.center + Vector2.left * 50f,
-				mousePosition - Vector2.left * 50f,
+				rect.center + Vector2.left,
+				mousePosition - Vector2.left,
 				Color.white,
 				null,
 				2f

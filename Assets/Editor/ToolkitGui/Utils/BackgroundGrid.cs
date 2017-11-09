@@ -1,4 +1,4 @@
-﻿using Assets.Editor.VisualNovelToolkitEditor;
+﻿using Assets.Editor.Vnt;
 using UnityEditor;
 using UnityEngine;
 

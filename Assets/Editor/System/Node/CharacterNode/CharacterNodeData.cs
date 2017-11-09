@@ -1,6 +1,10 @@
-﻿namespace Assets.Editor.System.Node.CharacterNode
+﻿using UnityEngine;
+
+namespace Assets.Editor.System.Node.CharacterNode
 {
-	sealed class CharacterNodeData : NodeData
+	public sealed class CharacterNodeData : NodeData
 	{
+		public string TexturePath;
+		public Rect Rect;
 	}
 }

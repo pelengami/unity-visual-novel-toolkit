@@ -1,6 +1,6 @@
 ﻿namespace Assets.Editor.System.Node.CharacterNode.DialogueNode
 {
-	sealed class DialogueNodeData : NodeData
+	public sealed class DialogueNodeData : NodeData
 	{
 	}
 }

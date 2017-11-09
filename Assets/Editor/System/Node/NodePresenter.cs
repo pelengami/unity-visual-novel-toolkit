@@ -39,14 +39,17 @@ namespace Assets.Editor.System.Node
 		public ConnectionPointPresenter ConnectionPointIn { get { return _connectionPointInPresenter; } }
 		public ConnectionPointPresenter ConnectionPointOut { get { return _connectionPointOutPresenter; } }
 		public ConnectionPointPresenter SelectedConnectionPointPresenter { get { return _selectedConnectionPointPresenter; } }
-		public Guid Id { get; }
+		public NodeData NodeData { get { return _nodeData; } }
+		public Guid Id { get; private set; }
 
 		public virtual void Draw()
 		{
 			_nodeView.Draw();
 
-			_connectionPointInPresenter.Draw();
-			_connectionPointOutPresenter.Draw();
+			_connectionPointInPresenter.Draw(_nodeView.Rect);
+			_connectionPointOutPresenter.Draw(_nodeView.Rect);
+
+			UpdateNodeData();
 		}
 
 		public void DrawParameters(NodeParametersPanel nodeParametersPanel)
@@ -69,6 +72,13 @@ namespace Assets.Editor.System.Node
 			_nodeView.ProcessEvents(e);
 			_connectionPointInPresenter.ProcessEvents(e);
 			_connectionPointOutPresenter.ProcessEvents(e);
+		}
+
+		private void UpdateNodeData()
+		{
+			var rect = _nodeView.Rect;
+			_nodeData.X = rect.x;
+			_nodeData.Y = rect.y;
 		}
 
 		private void OnMouseClicked(Vector2 vector2)

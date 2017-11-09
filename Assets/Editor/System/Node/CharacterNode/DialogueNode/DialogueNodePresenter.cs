@@ -19,22 +19,27 @@ namespace Assets.Editor.System.Node.CharacterNode.DialogueNode
 		{
 			_nodeView = nodeView;
 
-			var parameter = new NodeParameter("Texture Path")
+			var dialogueParam = new NodeParameter(LocalizationStrings.Dialogue)
 			{
-				IsClickable = true
+				IsEditable = true,
+				Height = 80,
+				Width = 200
 			};
 
 			_nodeParametersPanel = new NodeParametersPanel(new List<NodeParameter>
 			{
-				parameter
-			});
+				dialogueParam
+			})
+			{
+				Width = 320
+			};
 		}
 
 		public static NodePresenter Create(Vector2 position)
 		{
 			var nodeView = new DialogueNodeView(LocalizationStrings.DialogueNode, position);
-			var connectionPointInPresenter = new ConnectionPointPresenter(new ConnectionPointView(nodeView, ConnectionPointType.In));
-			var connectionPointOutPresenter = new ConnectionPointPresenter(new ConnectionPointView(nodeView, ConnectionPointType.Out));
+			var connectionPointInPresenter = new ConnectionPointPresenter(new ConnectionPointView(ConnectionPointType.In));
+			var connectionPointOutPresenter = new ConnectionPointPresenter(new ConnectionPointView(ConnectionPointType.Out));
 			var nodeData = new DialogueNodeData();
 			var nodePresenter = new DialogueNodePresenter(nodeView, nodeData, connectionPointInPresenter, connectionPointOutPresenter);
 			return nodePresenter;
@@ -44,7 +49,7 @@ namespace Assets.Editor.System.Node.CharacterNode.DialogueNode
 		{
 			base.Draw();
 
-			base.DrawParameters(_nodeParametersPanel);
+			DrawParameters(_nodeParametersPanel);
 		}
 	}
 }

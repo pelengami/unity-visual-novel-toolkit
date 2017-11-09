@@ -34,8 +34,8 @@ namespace Assets.Editor.System.Node.CharacterNode.AnswerNode
 		public static NodePresenter Create(Vector2 position)
 		{
 			var nodeView = new AnswerNodeView(LocalizationStrings.AnswerNode, position);
-			var connectionPointInPresenter = new ConnectionPointPresenter(new ConnectionPointView(nodeView, ConnectionPointType.In));
-			var connectionPointOutPresenter = new ConnectionPointPresenter(new ConnectionPointView(nodeView, ConnectionPointType.Out));
+			var connectionPointInPresenter = new ConnectionPointPresenter(new ConnectionPointView(ConnectionPointType.In));
+			var connectionPointOutPresenter = new ConnectionPointPresenter(new ConnectionPointView(ConnectionPointType.Out));
 			var nodeData = new AnswerNodeData();
 			var nodePresenter = new AnswerNodePresenter(nodeView, nodeData, connectionPointInPresenter, connectionPointOutPresenter);
 			return nodePresenter;

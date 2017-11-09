@@ -20,9 +20,9 @@ namespace Assets.Editor.System.ConnectionPoint
 		public bool IsSelected { get { return _isSelected; } }
 		public Rect Rect { get { return _connectionPointView.Rect; } }
 
-		public void Draw()
+		public void Draw(Rect rect)
 		{
-			_connectionPointView.Draw();
+			_connectionPointView.Draw(rect);
 		}
 
 		public void ProcessEvents(Event e)

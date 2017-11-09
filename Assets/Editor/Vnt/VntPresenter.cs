@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Assets.Editor.Localization;
+using Assets.Editor.Serialization;
 using Assets.Editor.System.ConnectionLine;
 using Assets.Editor.System.ConnectionPoint;
 using Assets.Editor.System.Node;
@@ -10,11 +10,12 @@ using Assets.Editor.System.Node.CharacterNode.DialogueNode;
 using Assets.Editor.System.Node.CharacterNode.QuestionNode;
 using Assets.Editor.System.Node.SetBackgroundNode;
 using Assets.Editor.ToolkitGui.Controls.ContextMenu;
+using Assets.Editor.ToolkitGui.Controls.Dialog;
 using Assets.Editor.ToolkitGui.Controls.ToolPanelButton;
 using Assets.Editor.ToolkitGui.Styles;
 using UnityEngine;
 
-namespace Assets.Editor.VisualNovelToolkitEditor
+namespace Assets.Editor.Vnt
 {
 	sealed class VntPresenter
 	{
@@ -22,30 +23,30 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 		private readonly List<NodePresenter> _nodePresenters = new List<NodePresenter>();
 		private readonly List<ConnectionPresenter> _connectionPresenters = new List<ConnectionPresenter>();
 		private readonly ConnectionPresenter _connectionToMousePresenter;
-		private readonly VntModel _vntModel;
-
-		private NodePresenter _selectedNode;
+		private readonly VntData _vntData;
 
 		private NodePresenter _selectedNodePresenter;
 		private ConnectionPointPresenter _selectedPointPresenter;
 
-		public VntPresenter(IVntView vntView, VntModel vntModel)
+		public VntPresenter(IVntView vntView, VntData vntData)
 		{
 			_vntView = vntView;
-			_vntModel = vntModel;
+			_vntData = vntData;
 			_vntView.MouseClicked += VntViewOnMouseClicked;
 			_vntView.Awaked += VntViewOnAwaked;
 			_vntView.OnGui += VntViewOnGui;
 			_vntView.Drag += VntViewOnDrag;
 			_vntView.ProcessedEvents += VntViewOnProcessedEvents;
 
-			_connectionToMousePresenter = new ConnectionPresenter(new ConnectionView(), new ConnectionModel());
+			_connectionToMousePresenter = new ConnectionPresenter(new ConnectionView(), new ConnectionData());
 		}
 
 		private void VntViewOnAwaked()
 		{
 			StylesCollection.LoadStyles();
-			_vntModel.LoadNodes();
+			_vntData.LoadNodes();
+
+			OnSetBackgroundClicked(new Vector2(150, 150));
 		}
 
 		private void VntViewOnGui()
@@ -68,9 +69,33 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 			var loadButton = new ToolPanelButton("Load");
 			var saveButton = new ToolPanelButton("Save");
 
-			createNewButton.Clicked += () => { };
+			createNewButton.Clicked += () =>
+			{
+				foreach (var nodePresenter in _nodePresenters)
+				{
+					nodePresenter.ConnectionPointSelected -= OnConnectionPointSelected;
+					nodePresenter.ConnectionPointUnSelected -= OnConnectionPointUnSelected;
+				}
+
+				_nodePresenters.Clear();
+				_connectionPresenters.Clear();
+				_selectedNodePresenter = null;
+				_selectedPointPresenter = null;
+			};
+
 			loadButton.Clicked += () => { };
-			saveButton.Clicked += () => { };
+
+			saveButton.Clicked += () =>
+			{
+				var saveFileDialog = new SaveFileDialog();
+				saveFileDialog.ShowDialog();
+
+				if (saveFileDialog.Result)
+				{
+					var path = saveFileDialog.Path;
+					XmlReadWriter.Write<VntData>(path, _vntData);
+				}
+			};
 
 			var toolPanelButtons = new List<ToolPanelButton>()
 			{
@@ -143,12 +168,17 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 			_vntView.ShowContextMenu(mousePosition, contextMenuItems);
 		}
 
+		#region Create Nodes
+
+		//todo refact
+
 		private void OnSetBackgroundClicked(Vector2 mousePosition)
 		{
 			var nodePresenter = SetBackgroundNodePresenter.Create(mousePosition);
 			nodePresenter.ConnectionPointSelected += OnConnectionPointSelected;
 			nodePresenter.ConnectionPointUnSelected += OnConnectionPointUnSelected;
 			_nodePresenters.Add(nodePresenter);
+			_vntData.AddNodeData(nodePresenter.NodeData);
 		}
 
 		private void OnCharacterMenuItemClicked(Vector2 mousePosition)
@@ -157,6 +187,7 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 			nodePresenter.ConnectionPointSelected += OnConnectionPointSelected;
 			nodePresenter.ConnectionPointUnSelected += OnConnectionPointUnSelected;
 			_nodePresenters.Add(nodePresenter);
+			_vntData.AddNodeData(nodePresenter.NodeData);
 		}
 
 		private void OnDialogueMenuItemClicked(Vector2 mousePosition)
@@ -165,6 +196,7 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 			nodePresenter.ConnectionPointSelected += OnConnectionPointSelected;
 			nodePresenter.ConnectionPointUnSelected += OnConnectionPointUnSelected;
 			_nodePresenters.Add(nodePresenter);
+			_vntData.AddNodeData(nodePresenter.NodeData);
 		}
 
 		private void OnQuestionMenuItemClicked(Vector2 mousePosition)
@@ -173,6 +205,7 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 			nodePresenter.ConnectionPointSelected += OnConnectionPointSelected;
 			nodePresenter.ConnectionPointUnSelected += OnConnectionPointUnSelected;
 			_nodePresenters.Add(nodePresenter);
+			_vntData.AddNodeData(nodePresenter.NodeData);
 		}
 
 		private void OnAnswerMenuItemClicked(Vector2 mousePosition)
@@ -181,7 +214,12 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 			nodePresenter.ConnectionPointSelected += OnConnectionPointSelected;
 			nodePresenter.ConnectionPointUnSelected += OnConnectionPointUnSelected;
 			_nodePresenters.Add(nodePresenter);
+			_vntData.AddNodeData(nodePresenter.NodeData);
 		}
+
+		#endregion
+
+		#region ConnectionPoints
 
 		private void OnConnectionPointSelected(NodePresenter nodePresenter, ConnectionPointPresenter connectionPointPresenter)
 		{
@@ -189,15 +227,16 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 			{
 				var selectedConnectionPointPresenter = _selectedPointPresenter;
 
-				var connectionBetweenNodes = new ConnectionPresenter(new ConnectionView(), new ConnectionModel())
-				{
-					ConnectionPointFrom = selectedConnectionPointPresenter,
-					ConnectionPointTo = connectionPointPresenter
-				};
+				var connectionBetweenNodes = new ConnectionPresenter(new ConnectionView(), new ConnectionData());
+
+				connectionBetweenNodes.SetFrom(selectedConnectionPointPresenter, _selectedNodePresenter.Id);
+				connectionBetweenNodes.SetTo(connectionPointPresenter, nodePresenter.Id);
 
 				_selectedNodePresenter.AddNextNode(nodePresenter);
 
 				_connectionPresenters.Add(connectionBetweenNodes);
+
+				_vntData.AddConnectionData(connectionBetweenNodes.ConnectionData);
 
 				_selectedNodePresenter = null;
 
@@ -213,5 +252,7 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 			_selectedNodePresenter = null;
 			_selectedPointPresenter = null;
 		}
+
+		#endregion
 	}
 }

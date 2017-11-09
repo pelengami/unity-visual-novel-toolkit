@@ -7,7 +7,7 @@ using Assets.Editor.ToolkitGui.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace Assets.Editor.VisualNovelToolkitEditor
+namespace Assets.Editor.Vnt
 {
 	sealed class VntView : EditorWindow, IVntView
 	{
@@ -25,7 +25,7 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 		public float Width { get { return _window.position.width; } }
 		public float Height { get { return _window.position.height; } }
 
-		[MenuItem("VisualNovelToolkit/ShowDialog")]
+		[MenuItem("VisualNovelToolkit/Open")]
 		public static void ShowEdiorMenuItem()
 		{
 			_window = GetWindow<VntView>(false, LocalizationStrings.WindowTitle, true);
@@ -33,7 +33,7 @@ namespace Assets.Editor.VisualNovelToolkitEditor
 
 		public void Awake()
 		{
-			_vntPresenter = new VntPresenter(this, new VntModel());
+			_vntPresenter = new VntPresenter(this, new VntData());
 			_backgroundGrid = new BackgroundGrid(this);
 
 			if (Awaked != null)

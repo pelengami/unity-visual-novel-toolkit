@@ -1,4 +1,5 @@
-﻿using Assets.Editor.System.ConnectionPoint;
+﻿using System;
+using Assets.Editor.System.ConnectionPoint;
 using UnityEngine;
 
 namespace Assets.Editor.System.ConnectionLine
@@ -6,17 +7,19 @@ namespace Assets.Editor.System.ConnectionLine
 	sealed class ConnectionPresenter
 	{
 		private readonly ConnectionView _connectionView;
-		private readonly ConnectionModel _connectionModel;
+		private readonly ConnectionData _connectionData;
 		private Vector2 _mousePosition;
 
-		public ConnectionPresenter(ConnectionView connectionView, ConnectionModel connectionModel)
+		public ConnectionPresenter(ConnectionView connectionView, ConnectionData connectionData)
 		{
 			_connectionView = connectionView;
-			_connectionModel = connectionModel;
+			_connectionData = connectionData;
 		}
 
-		public ConnectionPointPresenter ConnectionPointFrom { get; set; }
-		public ConnectionPointPresenter ConnectionPointTo { get; set; }
+		public ConnectionPointPresenter ConnectionPointFrom { get; private set; }
+		public ConnectionPointPresenter ConnectionPointTo { get; private set; }
+
+		public ConnectionData ConnectionData { get { return _connectionData; } }
 
 		public void Draw()
 		{
@@ -32,6 +35,18 @@ namespace Assets.Editor.System.ConnectionLine
 		public void ProcessEvents(Event e)
 		{
 			_mousePosition = e.mousePosition;
+		}
+
+		public void SetFrom(ConnectionPointPresenter connectionPointPresenter, Guid nodeId)
+		{
+			ConnectionPointFrom = connectionPointPresenter;
+			_connectionData.From = nodeId;
+		}
+
+		public void SetTo(ConnectionPointPresenter connectionPointPresenter, Guid nodeId)
+		{
+			ConnectionPointTo = connectionPointPresenter;
+			_connectionData.To = nodeId;
 		}
 	}
 }

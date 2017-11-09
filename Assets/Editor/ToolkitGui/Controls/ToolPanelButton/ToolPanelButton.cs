@@ -20,8 +20,6 @@ namespace Assets.Editor.ToolkitGui.Controls.ToolPanelButton
 			if (!GUILayout.Button(_text, EditorStyles.toolbarButton))
 				return;
 
-			GUIUtility.ExitGUI();
-
 			if (Clicked != null)
 				Clicked.Invoke();
 		}

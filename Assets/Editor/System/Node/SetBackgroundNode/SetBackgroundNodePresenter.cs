@@ -11,15 +11,17 @@ namespace Assets.Editor.System.Node.SetBackgroundNode
 	sealed class SetBackgroundNodePresenter : NodePresenter
 	{
 		private readonly SetBackgroundNodeView _nodeView;
+		private readonly SetBackgroundNodeData _nodeData;
 		private readonly NodeParametersPanel _nodeParametersPanel;
 
 		public SetBackgroundNodePresenter(SetBackgroundNodeView nodeView,
-			NodeData nodeData,
+			SetBackgroundNodeData nodeData,
 			ConnectionPointPresenter connectionPointInPresenter,
 			ConnectionPointPresenter connectionPointOutPresenter) :
 			base(nodeView, nodeData, connectionPointInPresenter, connectionPointOutPresenter)
 		{
 			_nodeView = nodeView;
+			_nodeData = nodeData;
 
 			var parameter = new NodeParameter("Texture Path")
 			{
@@ -37,8 +39,8 @@ namespace Assets.Editor.System.Node.SetBackgroundNode
 		public static NodePresenter Create(Vector2 position)
 		{
 			var nodeView = new SetBackgroundNodeView(LocalizationStrings.SetBackgroundNode, position);
-			var connectionPointInPresenter = new ConnectionPointPresenter(new ConnectionPointView(nodeView, ConnectionPointType.In));
-			var connectionPointOutPresenter = new ConnectionPointPresenter(new ConnectionPointView(nodeView, ConnectionPointType.Out));
+			var connectionPointInPresenter = new ConnectionPointPresenter(new ConnectionPointView(ConnectionPointType.In));
+			var connectionPointOutPresenter = new ConnectionPointPresenter(new ConnectionPointView(ConnectionPointType.Out));
 			var nodeData = new SetBackgroundNodeData();
 			var nodePresenter = new SetBackgroundNodePresenter(nodeView, nodeData, connectionPointInPresenter, connectionPointOutPresenter);
 			return nodePresenter;
@@ -48,7 +50,7 @@ namespace Assets.Editor.System.Node.SetBackgroundNode
 		{
 			base.Draw();
 
-			base.DrawParameters(_nodeParametersPanel);
+			DrawParameters(_nodeParametersPanel);
 		}
 
 		private void OnTextureParameterClicked()
@@ -57,7 +59,10 @@ namespace Assets.Editor.System.Node.SetBackgroundNode
 			dialog.ShowDialog();
 
 			if (dialog.Result)
+			{
 				_nodeView.TexturePath = dialog.Path;
+				_nodeData.TexturePath = dialog.Path;
+			}
 		}
 	}
 }

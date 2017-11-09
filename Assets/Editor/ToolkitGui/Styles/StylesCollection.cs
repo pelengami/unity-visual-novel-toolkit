@@ -43,6 +43,9 @@ namespace Assets.Editor.ToolkitGui.Styles
 
 			style = CreateButtonStyle("Assets/Editor/Textures/Down.psd");
 			Styles[VntStyles.ButtonArrow] = style;
+
+			style = CreateTextFieldStyle();
+			Styles[VntStyles.TextField] = style;
 		}
 
 		public static GUIStyle GetStyle(VntStyles vntStyle)
@@ -84,6 +87,18 @@ namespace Assets.Editor.ToolkitGui.Styles
 			{
 				normal = { textColor = Color.white },
 				fontSize = 12
+			};
+
+			return style;
+		}
+
+		private static GUIStyle CreateTextFieldStyle()
+		{
+			var style = new GUIStyle
+			{
+				normal = { textColor = Color.black },
+				fontSize = 13,
+				alignment = TextAnchor.UpperCenter
 			};
 
 			return style;

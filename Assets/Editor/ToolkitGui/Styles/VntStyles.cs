@@ -13,6 +13,7 @@
 		ConnectionOut,
 
 		Label,
+		TextField,
 		Button,
 		ButtonArrow
 	}

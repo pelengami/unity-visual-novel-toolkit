@@ -4,7 +4,7 @@ using Assets.Editor.ToolkitGui.Controls.ContextMenu;
 using Assets.Editor.ToolkitGui.Controls.ToolPanelButton;
 using UnityEngine;
 
-namespace Assets.Editor.VisualNovelToolkitEditor
+namespace Assets.Editor.Vnt
 {
 	interface IVntView : IWindow
 	{

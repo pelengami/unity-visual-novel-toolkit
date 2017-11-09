@@ -13,16 +13,14 @@ namespace Assets.Editor.System.Node
 		protected GUIStyle DefaultNodeStyle;
 		protected GUIStyle SelectedNodeStyle;
 
-		private const float PaddingNameTop = 18;
-		private const float Width = 70;
-		private const float Height = 70;
-		private const float ButtonArrowWidth = 35;
-		private const float ButtonArrowHeight = 35;
+		private const float Width = 90;
+		private const float Height = 130;
+		private const float ButtonArrowWidth = 28;
+		private const float ButtonArrowHeight = 28;
 
-		private readonly string _title;
 		private readonly GUIStyle _labelStyle;
-		private GUIStyle _buttonStyle;
 		private readonly GUIStyle _arrowButtonStyle;
+		private string _title;
 		private bool _isExpanded;
 		private bool _isSelected;
 		private bool _isDragged;
@@ -32,9 +30,9 @@ namespace Assets.Editor.System.Node
 			_title = title;
 			BRect = new Rect(position.x, position.y, Width, Height);
 
-			_labelStyle = StylesCollection.GetStyle(VntStyles.Label);
-			_buttonStyle = StylesCollection.GetStyle(VntStyles.Button);
 			_arrowButtonStyle = StylesCollection.GetStyle(VntStyles.ButtonArrow);
+
+			_arrowButtonStyle.margin = new RectOffset(60, 0, 0, 0);
 		}
 
 		public event Action<Vector2> MouseClicked;
@@ -45,14 +43,23 @@ namespace Assets.Editor.System.Node
 		public virtual void Draw()
 		{
 			var style = _isSelected ? SelectedNodeStyle : DefaultNodeStyle;
-			GUI.Box(BRect, "", style);
+			style.fixedHeight = 80;
+			style.fixedWidth = 80;
 
-			var labelRect = new Rect(BRect.x, BRect.y - PaddingNameTop, 100, 20);
-			GUI.Box(labelRect, _title, _labelStyle);
+			var screenRect = BRect;
+			screenRect.height += 3;
+			GUILayout.BeginArea(screenRect);
+			GUILayout.BeginVertical();
 
-			var buttonArrowRect = new Rect(BRect.x + Width / 2 + 15, BRect.y + 45, ButtonArrowWidth, ButtonArrowHeight);
-			if (GUI.Button(buttonArrowRect, "", _arrowButtonStyle))
+			_title = GUILayout.TextField(_title, GUILayout.MaxWidth(screenRect.width));
+			GUILayout.Box("", style);
+
+			GUILayout.Space(-25);
+			if (GUILayout.Button("", _arrowButtonStyle, GUILayout.Width(ButtonArrowWidth), GUILayout.Height(ButtonArrowHeight)))
 				_isExpanded = !_isExpanded;
+
+			GUILayout.EndVertical();
+			GUILayout.EndArea();
 		}
 
 		public void DrawParameters(NodeParametersPanel nodeParametersPanel)
@@ -116,6 +123,7 @@ namespace Assets.Editor.System.Node
 						return true;
 					}
 					break;
+
 			}
 			return false;
 		}

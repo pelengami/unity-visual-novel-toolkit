@@ -1,7 +1,16 @@
-﻿namespace Assets.Editor.System.Node.SetBackgroundNode
+﻿using System;
+using System.Xml.Serialization;
+
+namespace Assets.Editor.System.Node.SetBackgroundNode
 {
-	sealed class SetBackgroundNodeData : NodeData
+	public class SetBackgroundNodeData : NodeData
 	{
-		public string TexturePath { get; set; }
+		private string _texturePath;
+
+		public string TexturePath
+		{
+			get { return _texturePath; }
+			set { _texturePath = value; }
+		}
 	}
 }
