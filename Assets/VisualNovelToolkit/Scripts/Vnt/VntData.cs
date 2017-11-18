@@ -1,25 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
-using Assets.Editor.System.ConnectionLine;
-using Assets.Editor.System.Node;
+using Assets.VisualNovelToolkit.Scripts.System.Link;
+using Assets.VisualNovelToolkit.Scripts.System.Node;
 
-namespace Editor.Vnt
+namespace Assets.VisualNovelToolkit.Scripts.Vnt
 {
 	[XmlRoot("VntData")]
-	public sealed class VntData
+	[Serializable]
+	internal sealed class VntData
 	{
 		private readonly List<NodeData> _nodeDatas = new List<NodeData>();
-		private readonly List<ConnectionData> _connectionDatas = new List<ConnectionData>();
+		private readonly List<LinkData> _connectionDatas = new List<LinkData>();
 
-		public List<NodeData> NodeDatas
-		{
-			get { return _nodeDatas; }
-		}
+		private List<NodeData> NodeDatas => _nodeDatas;
 
-		public List<ConnectionData> ConnectionDatas
-		{
-			get { return _connectionDatas; }
-		}
+		private List<LinkData> ConnectionDatas => _connectionDatas;
 
 		public void LoadNodes()
 		{
@@ -31,9 +27,9 @@ namespace Editor.Vnt
 			NodeDatas.Add(nodeData);
 		}
 
-		public void AddConnectionData(ConnectionData connectionData)
+		public void AddConnectionData(LinkData linkData)
 		{
-			ConnectionDatas.Add(connectionData);
+			ConnectionDatas.Add(linkData);
 		}
 	}
 }

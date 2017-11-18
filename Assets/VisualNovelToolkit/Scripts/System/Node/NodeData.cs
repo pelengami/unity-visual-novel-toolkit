@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Xml.Serialization;
-using Assets.Editor.System.Node.CharacterNode;
-using Assets.Editor.System.Node.SetBackgroundNode;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Assets.Editor.System.Node
+namespace Assets.VisualNovelToolkit.Scripts.System.Node
 {
-    [XmlInclude(typeof(CharacterNodeData))]
-    [XmlInclude(typeof(SetBackgroundNodeData))]
     [Serializable]
     public abstract class NodeData : MonoBehaviour, IEquatable<NodeData>
     {
@@ -17,12 +12,9 @@ namespace Assets.Editor.System.Node
         public float X;
         public float Y;
 
-        public Object RuntimeInstance
-        {
-            get { return Selection.activeObject; }
-        }
+        public Object RuntimeInstance => Selection.activeObject;
 
-        public bool IsValid { get { return true; } }
+        public bool IsValid => true;
 
         protected NodeData()
         {

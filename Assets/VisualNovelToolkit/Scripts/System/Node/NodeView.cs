@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Assets.Editor.ToolkitGui.Controls.ContextMenu;
-using Assets.Editor.ToolkitGui.Controls.ParametersPanel;
-using Assets.Editor.ToolkitGui.Styles;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Controls.ContextMenu;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Controls.ParametersPanel;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Styles;
 using UnityEngine;
 
-namespace Assets.Editor.System.Node
+namespace Assets.VisualNovelToolkit.Scripts.System.Node
 {
-	abstract class NodeView : INodeView
+	internal abstract class NodeView : INodeView
 	{
 		protected Rect BRect;
 		protected float Width = 90;
@@ -15,19 +15,14 @@ namespace Assets.Editor.System.Node
 		protected GUIStyle DefaultNodeStyle;
 		protected GUIStyle SelectedNodeStyle;
 
-		private const float ButtonArrowWidth = 28;
-		private const float ButtonArrowHeight = 28;
-
 		private readonly GUIStyle _labelStyle;
 		private readonly GUIStyle _arrowButtonStyle;
-		private string _title;
 		private bool _isExpanded;
 		private bool _isSelected;
 		private bool _isDragged;
 
-		protected NodeView(string title, Vector2 position)
+		protected NodeView(Vector2 position)
 		{
-			_title = title;
 			BRect = new Rect(position.x, position.y, Width, Height);
 			
 			_arrowButtonStyle = StylesCollection.GetStyle(VntStyles.ButtonArrow);
@@ -37,12 +32,10 @@ namespace Assets.Editor.System.Node
 		public event Action<Vector2> MouseClicked;
 		public event Action Selected;
 
-		public Rect Rect { get { return BRect; } }
-		public bool IsExpanded { get { return _isExpanded; } }
+		public Rect Rect => BRect;
 
 		public virtual void Draw()
 		{
-			//todo change
 			BRect.width = Width;
 			BRect.height = Height;
 			
@@ -55,12 +48,7 @@ namespace Assets.Editor.System.Node
 			GUILayout.BeginArea(screenRect);
 			GUILayout.BeginVertical();
 
-//			_title = GUILayout.TextField(_title, GUILayout.MaxWidth(screenRect.width));
 			GUILayout.Box("", style);
-
-//			GUILayout.Space(-25);
-//			if (GUILayout.Button("", _arrowButtonStyle, GUILayout.Width(ButtonArrowWidth), GUILayout.Height(ButtonArrowHeight)))
-//				_isExpanded = !_isExpanded;
 
 			GUILayout.EndVertical();
 			GUILayout.EndArea();
@@ -97,9 +85,7 @@ namespace Assets.Editor.System.Node
 							_isDragged = true;
 							_isSelected = true;
 							GUI.changed = true;
-							
-							if (Selected!=null)
-								Selected.Invoke();
+							Selected?.Invoke();
 						}
 						else
 						{
@@ -110,8 +96,7 @@ namespace Assets.Editor.System.Node
 
 					if (e.button == 1 && _isSelected && BRect.Contains(e.mousePosition))
 					{
-						if (MouseClicked != null)
-							MouseClicked.Invoke(e.mousePosition);
+						MouseClicked?.Invoke(e.mousePosition);
 						e.Use();
 					}
 

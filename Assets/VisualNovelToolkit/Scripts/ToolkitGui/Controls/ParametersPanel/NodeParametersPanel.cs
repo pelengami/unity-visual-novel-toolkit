@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Assets.Editor.ToolkitGui.Styles;
-using Assets.Editor.ToolkitGui.Utils;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Styles;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Utils;
 using UnityEngine;
 
-namespace Assets.Editor.ToolkitGui.Controls.ParametersPanel
+namespace Assets.VisualNovelToolkit.Scripts.ToolkitGui.Controls.ParametersPanel
 {
 	sealed class NodeParametersPanel
 	{

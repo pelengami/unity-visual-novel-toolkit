@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEditor;
-using UnityEngine;
+﻿using UnityEditor;
 
-namespace Assets.Editor.ToolkitGui.Controls.Dialog
+namespace Assets.VisualNovelToolkit.Scripts.ToolkitGui.Controls.Dialog
 {
 	sealed class LoadTextureDialog
 	{
 		private bool _result;
 		private string _path;
 
-		public bool Result { get { return _result; } }
-		public string Path { get { return _path; } }
+		public bool Result => _result;
+		public string Path => _path;
 
 		public void ShowDialog()
 		{

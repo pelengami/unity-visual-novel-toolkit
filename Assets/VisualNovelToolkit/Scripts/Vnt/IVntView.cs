@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using Assets.Editor.ToolkitGui.Controls.ContextMenu;
-using Assets.Editor.ToolkitGui.Controls.ToolPanelButton;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Controls.ContextMenu;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Controls.ToolPanelButton;
 using UnityEngine;
 
-namespace Editor.Vnt
+namespace Assets.VisualNovelToolkit.Scripts.Vnt
 {
-	interface IVntView : IWindow
+	internal interface IVntView : IWindow
 	{
 		event Action<Vector2> MouseClicked;
 		event Action<Vector2> Drag;
@@ -15,6 +15,6 @@ namespace Editor.Vnt
 		event Action<Event> ProcessedEvents;
 
 		void ShowContextMenu(Vector2 mousePosition, List<ContextMenuItem> contextMenuItems);
-		void DrawToolPanel(List<ToolPanelButton> buttons);
+		void DrawToolPanel(IEnumerable<ToolPanelButton> buttons);
 	}
 }

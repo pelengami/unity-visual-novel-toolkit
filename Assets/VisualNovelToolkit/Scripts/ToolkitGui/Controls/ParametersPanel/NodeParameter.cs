@@ -1,8 +1,8 @@
 ﻿using System;
-using Assets.Editor.ToolkitGui.Styles;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Styles;
 using UnityEngine;
 
-namespace Assets.Editor.ToolkitGui.Controls.ParametersPanel
+namespace Assets.VisualNovelToolkit.Scripts.ToolkitGui.Controls.ParametersPanel
 {
 	sealed class NodeParameter
 	{
@@ -48,8 +48,7 @@ namespace Assets.Editor.ToolkitGui.Controls.ParametersPanel
 
 			if (IsClickable)
 				if (GUILayout.Button("", _buttonStyle))
-					if (Clicked != null)
-						Clicked.Invoke();
+					Clicked?.Invoke();
 
 			if (IsEditable)
 				Text = GUILayout.TextArea(Text, GUILayout.Height(Height), GUILayout.Width(Width));

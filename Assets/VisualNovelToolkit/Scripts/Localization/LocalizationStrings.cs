@@ -1,6 +1,6 @@
-﻿namespace Editor.Localization
+﻿namespace Assets.VisualNovelToolkit.Scripts.Localization
 {
-	public static class LocalizationStrings
+	internal static class LocalizationStrings
 	{
 		public const string WindowTitle = "VisualNovelToolkit";
 		

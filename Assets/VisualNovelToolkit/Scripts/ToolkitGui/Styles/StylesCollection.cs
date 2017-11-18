@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Assets.Editor.ToolkitGui.Utils;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Utils;
 using UnityEngine;
 
-namespace Assets.Editor.ToolkitGui.Styles
+namespace Assets.VisualNovelToolkit.Scripts.ToolkitGui.Styles
 {
 	static class StylesCollection
 	{
@@ -27,10 +27,10 @@ namespace Assets.Editor.ToolkitGui.Styles
 			Styles[VntStyles.QuestionNode] = style;
 
 			style = CreateConnectionPointStyle("Assets/VisualNovelToolkit/Textures/ConnectionPointNormal.psd", "Assets/Editor/Textures/ConnectionPointActive.psd");
-			Styles[VntStyles.ConnectionIn] = style;
+			Styles[VntStyles.PortIn] = style;
 
 			style = CreateConnectionPointStyle("Assets/VisualNovelToolkit/Textures/ConnectionPointNormal.psd", "Assets/Editor/Textures/ConnectionPointActive.psd");
-			Styles[VntStyles.ConnectionOut] = style;
+			Styles[VntStyles.PortOut] = style;
 
 			style = CreateNodeStyle("Assets/VisualNovelToolkit/Textures/NodeParameters.psd");
 			Styles[VntStyles.NodeParameters] = style;

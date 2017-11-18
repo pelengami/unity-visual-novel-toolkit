@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Assets.Editor.ToolkitGui.Controls.ContextMenu;
-using Assets.Editor.ToolkitGui.Controls.ToolPanelButton;
-using Assets.Editor.ToolkitGui.Utils;
-using Editor.Localization;
+using Assets.VisualNovelToolkit.Scripts.Localization;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Controls.ContextMenu;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Controls.ToolPanelButton;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Utils;
 using UnityEditor;
 using UnityEngine;
 
-namespace Editor.Vnt
+namespace Assets.VisualNovelToolkit.Scripts.Vnt
 {
 	sealed class VntView : EditorWindow, IVntView
 	{
@@ -22,8 +22,8 @@ namespace Editor.Vnt
 		public event Action<Event> ProcessedEvents;
 		public event Action OnGui;
 
-		public float Width { get { return _window.position.width; } }
-		public float Height { get { return _window.position.height; } }
+		public float Width => _window.position.width;
+		public float Height => _window.position.height;
 
 		[MenuItem("VisualNovelToolkit/Open")]
 		public static void ShowEdiorMenuItem()
@@ -36,8 +36,7 @@ namespace Editor.Vnt
 			_vntPresenter = new VntPresenter(this, new VntData());
 			_backgroundGrid = new BackgroundGrid(this);
 
-			if (Awaked != null)
-				Awaked.Invoke();
+			Awaked?.Invoke();
 		}
 
 		public void ShowContextMenu(Vector2 mousePosition, List<ContextMenuItem> contextMenuItems)
@@ -46,7 +45,7 @@ namespace Editor.Vnt
 			genericMenu.ShowAsContext();
 		}
 
-		public void DrawToolPanel(List<ToolPanelButton> toolPanelButtons)
+		public void DrawToolPanel(IEnumerable<ToolPanelButton> toolPanelButtons)
 		{
 			GUILayout.BeginHorizontal(EditorStyles.toolbar);
 			foreach (var toolPanelButton in toolPanelButtons)
@@ -54,18 +53,12 @@ namespace Editor.Vnt
 			GUILayout.EndHorizontal();
 		}
 
-		// ReSharper disable once InconsistentNaming
 		private void OnGUI()
 		{
 			_backgroundGrid.Draw();
 
-			// ReSharper disable once UseNullPropagation
-			if (OnGui != null)
-				OnGui.Invoke();
-
-			// ReSharper disable once UseNullPropagation
-			if (ProcessedEvents != null)
-				ProcessedEvents.Invoke(Event.current);
+			OnGui?.Invoke();
+			ProcessedEvents?.Invoke(Event.current);
 
 			ProcessEvents(Event.current);
 
@@ -79,15 +72,13 @@ namespace Editor.Vnt
 			{
 				case EventType.MouseDown:
 					if (e.button == 1)
-						if (MouseClicked != null)
-							MouseClicked.Invoke(e.mousePosition);
+						MouseClicked?.Invoke(e.mousePosition);
 					break;
 
 				case EventType.MouseDrag:
 					if (e.button == 0)
 					{
-						if (Drag != null)
-							Drag.Invoke(e.delta);
+						Drag?.Invoke(e.delta);
 						GUI.changed = true;
 					}
 					break;

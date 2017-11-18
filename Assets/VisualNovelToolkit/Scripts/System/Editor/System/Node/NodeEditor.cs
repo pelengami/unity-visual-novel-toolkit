@@ -1,11 +1,11 @@
-﻿using Assets.Editor.System.Node;
+﻿using Assets.VisualNovelToolkit.Scripts.System.Node;
 using UnityEditor;
 using UnityEngine;
 
 namespace VisualNovelToolkit.Scripts.System.Editor.System.Node
 {
     [CustomEditor(typeof(NodeData))]
-    abstract class NodeEditor : UnityEditor.Editor
+    internal abstract class NodeEditor : UnityEditor.Editor
     {
         private const string NameFieldName = "Name";
         

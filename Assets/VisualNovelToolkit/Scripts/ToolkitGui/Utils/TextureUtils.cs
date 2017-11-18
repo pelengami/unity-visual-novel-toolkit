@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace Assets.Editor.ToolkitGui.Utils
+namespace Assets.VisualNovelToolkit.Scripts.ToolkitGui.Utils
 {
 	static class TextureUtils
 	{

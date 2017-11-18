@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using System.Xml.Serialization;
 
-namespace Editor.Serialization
+namespace Assets.VisualNovelToolkit.Scripts.Serialization
 {
-    static class XmlReadWriter
+    internal static class XmlReadWriter
     {
         public static void Write<T>(string path, object obj)
         {

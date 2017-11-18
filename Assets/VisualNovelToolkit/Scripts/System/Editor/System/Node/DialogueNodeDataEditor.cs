@@ -1,4 +1,4 @@
-﻿using Assets.Editor.System.Dialogue;
+﻿using Assets.VisualNovelToolkit.Scripts.System.Node.Dialogue;
 using UnityEditor;
 using UnityEngine;
 
@@ -6,7 +6,7 @@ namespace VisualNovelToolkit.Scripts.System.Editor.System.Node
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(DialogueNodeData), true)]
-    sealed class DialogueNodeDataEditor : NodeEditor
+    internal sealed class DialogueNodeDataEditor : NodeEditor
     {
         private const string DataPropertyName = "Data";
         private const string DataFieldName = "Data";

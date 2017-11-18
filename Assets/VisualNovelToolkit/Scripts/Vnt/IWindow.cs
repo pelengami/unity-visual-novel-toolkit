@@ -1,6 +1,6 @@
-﻿namespace Editor.Vnt
+﻿namespace Assets.VisualNovelToolkit.Scripts.Vnt
 {
-	interface IWindow
+	internal interface IWindow
 	{
 		float Width { get; }
 		float Height { get; }

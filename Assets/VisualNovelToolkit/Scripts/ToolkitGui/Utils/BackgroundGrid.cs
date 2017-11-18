@@ -1,8 +1,8 @@
-﻿using Editor.Vnt;
+﻿using Assets.VisualNovelToolkit.Scripts.Vnt;
 using UnityEditor;
 using UnityEngine;
 
-namespace Assets.Editor.ToolkitGui.Utils
+namespace Assets.VisualNovelToolkit.Scripts.ToolkitGui.Utils
 {
 	sealed class BackgroundGrid
 	{

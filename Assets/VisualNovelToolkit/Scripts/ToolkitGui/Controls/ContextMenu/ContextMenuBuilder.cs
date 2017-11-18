@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Assets.Editor.ToolkitGui.Controls.ContextMenu
+namespace Assets.VisualNovelToolkit.Scripts.ToolkitGui.Controls.ContextMenu
 {
 	static class ContextMenuBuilder
 	{

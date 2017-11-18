@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Assets.Editor.ToolkitGui.Controls.ToolPanelButton
+namespace Assets.VisualNovelToolkit.Scripts.ToolkitGui.Controls.ToolPanelButton
 {
 	sealed class ToolPanelButton
 	{
@@ -19,9 +19,7 @@ namespace Assets.Editor.ToolkitGui.Controls.ToolPanelButton
 		{
 			if (!GUILayout.Button(_text, EditorStyles.toolbarButton))
 				return;
-
-			if (Clicked != null)
-				Clicked.Invoke();
+			Clicked?.Invoke();
 		}
 	}
 }

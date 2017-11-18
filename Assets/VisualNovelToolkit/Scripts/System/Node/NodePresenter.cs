@@ -1,88 +1,67 @@
 ﻿using System;
 using System.Collections.Generic;
-using Assets.Editor.System.ConnectionPoint;
-using Assets.Editor.System.Dialogue;
-using Assets.Editor.ToolkitGui.Controls.ParametersPanel;
-using UnityEditor;
+using Assets.VisualNovelToolkit.Scripts.System.Port;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Controls.ParametersPanel;
 using UnityEngine;
 
-namespace Assets.Editor.System.Node
+namespace Assets.VisualNovelToolkit.Scripts.System.Node
 {
-    abstract class NodePresenter
+    internal abstract class NodePresenter
     {
         private readonly INodeView _nodeView;
-        private readonly NodeData _nodeData;
-        private readonly ConnectionPointPresenter _connectionPointInPresenter;
-        private readonly ConnectionPointPresenter _connectionPointOutPresenter;
         private readonly List<NodePresenter> _nextNodes = new List<NodePresenter>();
 
-        private ConnectionPointPresenter _selectedConnectionPointPresenter;
-
         protected NodePresenter(INodeView nodeView, NodeData nodeData,
-            ConnectionPointPresenter connectionPointInPresenter, ConnectionPointPresenter connectionPointOutPresenter)
+            PortPresenter portPresenter, PortPresenter portOutPresenter)
         {
             _nodeView = nodeView;
-            _nodeData = nodeData;
-            _connectionPointInPresenter = connectionPointInPresenter;
-            _connectionPointOutPresenter = connectionPointOutPresenter;
+            NodeData = nodeData;
+            Port = portPresenter;
+            PortOut = portOutPresenter;
 
             _nodeView.MouseClicked += OnMouseClicked;
             _nodeView.Selected += OnSelected;
 
-            _connectionPointInPresenter.Selected += ConnectionPointInPresenterOnSelected;
-            _connectionPointOutPresenter.Selected += ConnectionPointOutPresenterOnSelected;
-            _connectionPointInPresenter.UnSelected += ConnectionPointInPresenterOnUnSelected;
-            _connectionPointOutPresenter.UnSelected += ConnectionPointOutPresenterOnUnSelected;
+            Port.Selected += ConnectionPointInPresenterOnSelected;
+            PortOut.Selected += ConnectionPointOutPresenterOnSelected;
+            Port.UnSelected += ConnectionPointInPresenterOnUnSelected;
+            PortOut.UnSelected += ConnectionPointOutPresenterOnUnSelected;
 
             Id = Guid.NewGuid();
         }
 
-        public event Action<NodePresenter, ConnectionPointPresenter> ConnectionPointSelected;
-        public event Action<NodePresenter, ConnectionPointPresenter> ConnectionPointUnSelected;
+        public event Action<NodePresenter, PortPresenter> ConnectionPointSelected;
+        public event Action<NodePresenter, PortPresenter> ConnectionPointUnSelected;
         public event Action<NodePresenter> Selected;
 
-        public ConnectionPointPresenter ConnectionPointIn
-        {
-            get { return _connectionPointInPresenter; }
-        }
-
-        public ConnectionPointPresenter ConnectionPointOut
-        {
-            get { return _connectionPointOutPresenter; }
-        }
-
-        public ConnectionPointPresenter SelectedConnectionPointPresenter
-        {
-            get { return _selectedConnectionPointPresenter; }
-        }
-
-        public NodeData NodeData
-        {
-            get { return _nodeData; }
-        }
-
-        public Guid Id { get; private set; }
-
-        public virtual void Draw()
-        {
-            _nodeView.Draw();
-
-            _connectionPointInPresenter.Draw(_nodeView.Rect);
-            _connectionPointOutPresenter.Draw(_nodeView.Rect);
-
-            UpdateNodeData();
-        }
-
-        public void DrawParameters(NodeParametersPanel nodeParametersPanel)
-        {
-            _nodeView.DrawParameters(nodeParametersPanel);
-        }
+        public PortPresenter Port { get; }
+        public PortPresenter PortOut { get; }
+        public PortPresenter SelectedPortPresenter { get; private set; }
+        public NodeData NodeData { get; }
+        public Guid Id { get; }
 
         public void AddNextNode(NodePresenter nodePresenter)
         {
             _nextNodes.Add(nodePresenter);
         }
 
+        protected void DrawParameters(NodeParametersPanel nodeParametersPanel)
+        {
+            _nodeView.DrawParameters(nodeParametersPanel);
+        }
+
+        #region GUI
+
+        public virtual void Draw()
+        {
+            _nodeView.Draw();
+
+            Port.Draw(_nodeView.Rect);
+            PortOut.Draw(_nodeView.Rect);
+
+            UpdateNodeData();
+        }
+        
         public void Drag(Vector2 mousePosition)
         {
             _nodeView.Drag(mousePosition);
@@ -91,15 +70,15 @@ namespace Assets.Editor.System.Node
         public void ProcessEvents(Event e)
         {
             _nodeView.ProcessEvents(e);
-            _connectionPointInPresenter.ProcessEvents(e);
-            _connectionPointOutPresenter.ProcessEvents(e);
+            Port.ProcessEvents(e);
+            PortOut.ProcessEvents(e);
         }
 
         private void UpdateNodeData()
         {
             var rect = _nodeView.Rect;
-            _nodeData.X = rect.x;
-            _nodeData.Y = rect.y;
+            NodeData.X = rect.x;
+            NodeData.Y = rect.y;
         }
 
         private void OnMouseClicked(Vector2 vector2)
@@ -109,40 +88,33 @@ namespace Assets.Editor.System.Node
 
         private void OnSelected()
         {
-            if (Selected != null)
-                Selected.Invoke(this);
+            Selected?.Invoke(this);
         }
 
         private void ConnectionPointInPresenterOnSelected()
         {
-            _selectedConnectionPointPresenter = _connectionPointInPresenter;
-
-            if (ConnectionPointSelected != null)
-                ConnectionPointSelected.Invoke(this, _connectionPointInPresenter);
+            SelectedPortPresenter = Port;
+            ConnectionPointSelected?.Invoke(this, Port);
         }
 
         private void ConnectionPointOutPresenterOnSelected()
         {
-            _selectedConnectionPointPresenter = _connectionPointOutPresenter;
-
-            if (ConnectionPointSelected != null)
-                ConnectionPointSelected.Invoke(this, _connectionPointOutPresenter);
+            SelectedPortPresenter = PortOut;
+            ConnectionPointSelected?.Invoke(this, PortOut);
         }
 
         private void ConnectionPointInPresenterOnUnSelected()
         {
-            _selectedConnectionPointPresenter = null;
-
-            if (ConnectionPointUnSelected != null)
-                ConnectionPointUnSelected.Invoke(this, _connectionPointInPresenter);
+            SelectedPortPresenter = null;
+            ConnectionPointUnSelected?.Invoke(this, Port);
         }
 
         private void ConnectionPointOutPresenterOnUnSelected()
         {
-            _selectedConnectionPointPresenter = null;
-
-            if (ConnectionPointUnSelected != null)
-                ConnectionPointUnSelected.Invoke(this, _connectionPointOutPresenter);
+            SelectedPortPresenter = null;
+            ConnectionPointUnSelected?.Invoke(this, PortOut);
         }
+
+        #endregion
     }
 }

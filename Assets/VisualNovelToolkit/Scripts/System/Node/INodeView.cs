@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using Assets.Editor.ToolkitGui.Controls.ContextMenu;
-using Assets.Editor.ToolkitGui.Controls.ParametersPanel;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Controls.ContextMenu;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Controls.ParametersPanel;
 using UnityEngine;
 
-namespace Assets.Editor.System.Node
+namespace Assets.VisualNovelToolkit.Scripts.System.Node
 {
-	interface INodeView
+	internal interface INodeView
 	{
 		event Action<Vector2> MouseClicked;
 		event Action Selected;

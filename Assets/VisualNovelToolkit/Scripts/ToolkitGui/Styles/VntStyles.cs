@@ -1,4 +1,4 @@
-﻿namespace Assets.Editor.ToolkitGui.Styles
+﻿namespace Assets.VisualNovelToolkit.Scripts.ToolkitGui.Styles
 {
 	enum VntStyles
 	{
@@ -9,8 +9,8 @@
 		QuestionNode,
 
 		NodeParameters,
-		ConnectionIn,
-		ConnectionOut,
+		PortIn,
+		PortOut,
 
 		Label,
 		TextField,

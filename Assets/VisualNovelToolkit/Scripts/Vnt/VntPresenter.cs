@@ -1,31 +1,31 @@
 ﻿using System.Collections.Generic;
-using Assets.Editor.System.ConnectionLine;
-using Assets.Editor.System.ConnectionPoint;
-using Assets.Editor.System.Dialogue;
-using Assets.Editor.System.Node;
-using Assets.Editor.System.Node.CharacterNode;
-using Assets.Editor.System.Node.SetBackgroundNode;
-using Assets.Editor.ToolkitGui.Controls.ContextMenu;
-using Assets.Editor.ToolkitGui.Controls.Dialog;
-using Assets.Editor.ToolkitGui.Controls.ToolPanelButton;
-using Assets.Editor.ToolkitGui.Styles;
-using Editor.Localization;
-using Editor.Serialization;
+using Assets.VisualNovelToolkit.Scripts.Localization;
+using Assets.VisualNovelToolkit.Scripts.Serialization;
+using Assets.VisualNovelToolkit.Scripts.System;
+using Assets.VisualNovelToolkit.Scripts.System.Link;
+using Assets.VisualNovelToolkit.Scripts.System.Node;
+using Assets.VisualNovelToolkit.Scripts.System.Node.Dialogue;
+using Assets.VisualNovelToolkit.Scripts.System.Port;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Controls.ContextMenu;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Controls.Dialog;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Controls.ToolPanelButton;
+using Assets.VisualNovelToolkit.Scripts.ToolkitGui.Styles;
 using UnityEditor;
 using UnityEngine;
+using VisualNovelToolkit.Scripts.System.Filters;
 
-namespace Editor.Vnt
+namespace Assets.VisualNovelToolkit.Scripts.Vnt
 {
-    sealed class VntPresenter
+    internal sealed class VntPresenter
     {
         private readonly IVntView _vntView;
         private readonly List<NodePresenter> _nodePresenters = new List<NodePresenter>();
-        private readonly List<ConnectionPresenter> _connectionPresenters = new List<ConnectionPresenter>();
-        private readonly ConnectionPresenter _connectionToMousePresenter;
+        private readonly List<LinkPresenter> _connectionPresenters = new List<LinkPresenter>();
+        private readonly LinkPresenter _linkToMousePresenter;
         private readonly VntData _vntData;
 
         private NodePresenter _selectedNodePresenter;
-        private ConnectionPointPresenter _selectedPointPresenter;
+        private PortPresenter _selectedPointPresenter;
 
         public VntPresenter(IVntView vntView, VntData vntData)
         {
@@ -37,48 +37,16 @@ namespace Editor.Vnt
             _vntView.Drag += VntViewOnDrag;
             _vntView.ProcessedEvents += VntViewOnProcessedEvents;
 
-            _connectionToMousePresenter = new ConnectionPresenter(new ConnectionView(), new ConnectionData());
+            _linkToMousePresenter = new LinkPresenter(new LinkView(), new LinkData());
         }
 
         private void VntViewOnAwaked()
         {
             StylesCollection.LoadStyles();
             _vntData.LoadNodes();
-
-            var nodePresenter = DialogueNodePresenter.Create(new Vector2(300, 300));
-            nodePresenter.ConnectionPointSelected += OnConnectionPointSelected;
-            nodePresenter.ConnectionPointUnSelected += OnConnectionPointUnSelected;
-            nodePresenter.Selected += OnNodeSelected;
-
-            _nodePresenters.Add(nodePresenter);
-            _vntData.AddNodeData(nodePresenter.NodeData);
-
-            var nodePresenter1 = DialogueNodePresenter.Create(new Vector2(500, 300));
-            nodePresenter1.ConnectionPointSelected += OnConnectionPointSelected;
-            nodePresenter1.ConnectionPointUnSelected += OnConnectionPointUnSelected;
-            nodePresenter1.Selected += OnNodeSelected;
-            _nodePresenters.Add(nodePresenter1);
-            _vntData.AddNodeData(nodePresenter1.NodeData);
-            
-            var nodePresenter2 = DialogueNodePresenter.Create(new Vector2(500, 200));
-            nodePresenter2.ConnectionPointSelected += OnConnectionPointSelected;
-            nodePresenter2.ConnectionPointUnSelected += OnConnectionPointUnSelected;
-            nodePresenter2.Selected += OnNodeSelected;
-            _nodePresenters.Add(nodePresenter2);
-            _vntData.AddNodeData(nodePresenter2.NodeData);
-            
-            var connectionBetweenNodes = new ConnectionPresenter(new ConnectionView(), new ConnectionData());
-            connectionBetweenNodes.SetFrom(nodePresenter.ConnectionPointOut, nodePresenter.Id);
-            connectionBetweenNodes.SetTo(nodePresenter1.ConnectionPointIn, nodePresenter1.Id);
-            _connectionPresenters.Add(connectionBetweenNodes);
-            _vntData.AddConnectionData(connectionBetweenNodes.ConnectionData);
-            
-            connectionBetweenNodes = new ConnectionPresenter(new ConnectionView(), new ConnectionData());
-            connectionBetweenNodes.SetFrom(nodePresenter.ConnectionPointOut, nodePresenter.Id);
-            connectionBetweenNodes.SetTo(nodePresenter2.ConnectionPointIn, nodePresenter2.Id);
-            _connectionPresenters.Add(connectionBetweenNodes);
-            _vntData.AddConnectionData(connectionBetweenNodes.ConnectionData);
         }
+
+        #region GUI Events
 
         private void VntViewOnGui()
         {
@@ -90,15 +58,15 @@ namespace Editor.Vnt
             foreach (var connectionPresenter in _connectionPresenters)
                 connectionPresenter.Draw();
 
-            if (_selectedNodePresenter != null && _selectedNodePresenter.SelectedConnectionPointPresenter != null)
-                _connectionToMousePresenter.Draw(_selectedNodePresenter.SelectedConnectionPointPresenter.Rect);
+            if (_selectedNodePresenter != null && _selectedNodePresenter.SelectedPortPresenter != null)
+                _linkToMousePresenter.Draw(_selectedNodePresenter.SelectedPortPresenter.Rect);
         }
 
         private void OnNodeSelected(NodePresenter nodePresenter)
         {
             Selection.activeObject = nodePresenter.NodeData;
         }
-        
+
         private void DrawToolPanel()
         {
             var createNewButton = new ToolPanelButton("Create");
@@ -151,7 +119,7 @@ namespace Editor.Vnt
             foreach (var connectionPresenter in _connectionPresenters)
                 connectionPresenter.ProcessEvents(e);
 
-            _connectionToMousePresenter.ProcessEvents(e);
+            _linkToMousePresenter.ProcessEvents(e);
         }
 
         private void VntViewOnDrag(Vector2 vector2)
@@ -204,31 +172,32 @@ namespace Editor.Vnt
             _vntView.ShowContextMenu(mousePosition, contextMenuItems);
         }
 
+        #endregion
+
         #region Create Nodes
 
         //todo refact
 
         private void OnSetBackgroundClicked(Vector2 mousePosition)
         {
-            var nodePresenter = SetBackgroundNodePresenter.Create(mousePosition);
-            nodePresenter.ConnectionPointSelected += OnConnectionPointSelected;
-            nodePresenter.ConnectionPointUnSelected += OnConnectionPointUnSelected;
-            _nodePresenters.Add(nodePresenter);
-            _vntData.AddNodeData(nodePresenter.NodeData);
         }
 
         private void OnCharacterMenuItemClicked(Vector2 mousePosition)
         {
-            var nodePresenter = CharacterNodePresenter.Create(mousePosition);
-            nodePresenter.ConnectionPointSelected += OnConnectionPointSelected;
-            nodePresenter.ConnectionPointUnSelected += OnConnectionPointUnSelected;
-            _nodePresenters.Add(nodePresenter);
-            _vntData.AddNodeData(nodePresenter.NodeData);
         }
 
         private void OnDialogueMenuItemClicked(Vector2 mousePosition)
         {
-            var nodePresenter = DialogueNodePresenter.Create(mousePosition);
+            var nodeView = new DialogueNodeView(LocalizationStrings.DialogueNode, mousePosition);
+            var connectionPointInPresenter =
+                new PortPresenter(new PortView(PortType.In));
+            var connectionPointOutPresenter =
+                new PortPresenter(new PortView(PortType.Out));
+            var go = new GameObject(LocalizationStrings.DialogueNode);
+            var nodeData = go.AddComponent<DialogueNodeData>();
+            var nodePresenter = new DialogueNodePresenter(nodeView, nodeData, connectionPointInPresenter,
+                connectionPointOutPresenter);
+
             nodePresenter.ConnectionPointSelected += OnConnectionPointSelected;
             nodePresenter.ConnectionPointUnSelected += OnConnectionPointUnSelected;
             _nodePresenters.Add(nodePresenter);
@@ -237,35 +206,33 @@ namespace Editor.Vnt
 
         private void OnQuestionMenuItemClicked(Vector2 mousePosition)
         {
-           
         }
 
         private void OnAnswerMenuItemClicked(Vector2 mousePosition)
         {
-         
         }
 
         #endregion
 
-        #region ConnectionPoints
+        #region Create Connection Points
 
         private void OnConnectionPointSelected(NodePresenter nodePresenter,
-            ConnectionPointPresenter connectionPointPresenter)
+            PortPresenter portPresenter)
         {
             if (_selectedNodePresenter != null && _selectedNodePresenter.Id != nodePresenter.Id)
             {
                 var selectedConnectionPointPresenter = _selectedPointPresenter;
 
-                var connectionBetweenNodes = new ConnectionPresenter(new ConnectionView(), new ConnectionData());
+                var connectionBetweenNodes = new LinkPresenter(new LinkView(), new LinkData());
 
                 connectionBetweenNodes.SetFrom(selectedConnectionPointPresenter, _selectedNodePresenter.Id);
-                connectionBetweenNodes.SetTo(connectionPointPresenter, nodePresenter.Id);
+                connectionBetweenNodes.SetTo(portPresenter, nodePresenter.Id);
 
                 _selectedNodePresenter.AddNextNode(nodePresenter);
 
                 _connectionPresenters.Add(connectionBetweenNodes);
 
-                _vntData.AddConnectionData(connectionBetweenNodes.ConnectionData);
+                _vntData.AddConnectionData(connectionBetweenNodes.LinkData);
 
                 _selectedNodePresenter = null;
 
@@ -273,11 +240,11 @@ namespace Editor.Vnt
             }
 
             _selectedNodePresenter = nodePresenter;
-            _selectedPointPresenter = connectionPointPresenter;
+            _selectedPointPresenter = portPresenter;
         }
 
         private void OnConnectionPointUnSelected(NodePresenter nodePresenter,
-            ConnectionPointPresenter connectionPointPresenter)
+            PortPresenter portPresenter)
         {
             _selectedNodePresenter = null;
             _selectedPointPresenter = null;
